@@ -288,6 +288,10 @@ func main () {
   /* 未定義(0)が出力される */
 }
 ```
+参考 : 簡易文付きif文 
+https://code-database.com/knowledges/97
+
+
 ###　エラーハンドリング
 ```go
 var s string = "100"
