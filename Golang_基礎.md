@@ -234,8 +234,66 @@ https://artgear.hatenablog.com/entry/20120115/1326635158
 
 ```go
 func Later() func(string) string {
-  
-
+  var store string
+  return func(next string) string {
+    s := store
+    store = next
+    return s
+  }
 }
 
+func main () {
+  f := Later()
+  fmt.Println(f("Hello"))
+}
+```
+### ジェネレーター
+何らかのルールに従って連続した値を返し続ける仕組みのこと
+
+```go
+// クロージャーを使ってジェネレーターを作ることができる
+func intergers() func() int {
+  i := 0
+  return func() int {
+    i++
+    return i
+  }
+}
+```
+<br>
+<br>
+
+## 制御構文
+### if文
+```go
+func main () {
+  
+  /* 基本 */
+  a := 0
+  if a == 2 {
+
+  } else if a == 1 {
+
+  } else {
+
+  }
+
+  /* 簡易文付きif文 */
+  /* if 簡易文; 条件式 */
+  if b := 100; b == 100 {
+      println(b)
+      /* 100が出力される */
+  }
+  println(b)
+  /* 未定義(0)が出力される */
+}
+```
+###　エラーハンドリング
+```go
+var s string = "100"
+
+i, err := strcomv.Atoi(s)
+if err {
+  fmt.Prinfln(err)
+}
 ```
