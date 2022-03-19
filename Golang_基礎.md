@@ -301,3 +301,216 @@ if err {
   fmt.Prinfln(err)
 }
 ```
+### for
+```go
+/* 無限loop */ 
+for {
+
+}
+```
+
+```go
+i := 0
+for i < 10{
+  i++
+}
+```
+
+```go
+for i := 0 ; i < 10 ; i++ {
+
+}
+```
+
+```go
+// 配列の中身を取り出す
+arr := [3]int{1,2,3}
+for i := 0 ; i < len(arr) ; i++ {
+  fmt.Println(arr[i])
+}
+```
+```go
+// 範囲for文で配列の番号と要素を取り出す
+arr := [3]int{1,2,3}
+for i, v := range arr {
+  fmt.Println(i, v)
+}
+```
+```go
+// 範囲for文で配列の番号を取り出す
+arr := [3]int{1,2,3}
+for i := range arr {
+  fmt.Println(i)
+}
+```
+```go
+// 範囲for文で配列の要素を取り出す
+arr := [3]int{1,2,3}
+for _, v := range arr {
+  fmt.Println(v)
+}
+```
+
+```go
+// スライスも配列と同様にrangeで取り出せる
+sl := []string{"Python", "PHP", "GO"}
+for i, v := range sl {
+  fmt.Println(i,v)
+}
+```
+
+```go
+// マップも配列と同様にrangeで取り出せる
+m := map[string]int{"apple":100, "banana":200}
+for k,v := range m {
+  fmt.Println(k,v)
+}
+```
+
+### switch 式スイッチ
+```go
+/* これが基本。case 1,2で複数値を指定できるのが便利なところ。 */
+n := 2
+
+switch n {
+  case 1,2:
+    fmt.Println("1 or 2")
+  case 3,4:
+    fmt.Println("3 or 4")
+  default:
+    fmt.Println("other")
+}
+```
+```go
+/* nをswitch文の中で定義できる。この方が局所性を高めることができる。 */
+switch n:=2; n {
+  case 1,2:
+    fmt.Println("1 or 2")
+  case 3,4:
+    fmt.Println("3 or 4")
+  default:
+    fmt.Println("other")
+}
+```
+
+```go
+/* caseの判定は条件式を書くことができる。 */
+/* ただし条件式と値をcase同じswitch文の中に混在させることはできない。 */
+switch n:=2; n {
+  case n > 0 && n < 4:
+    fmt.Println("0 < n < 4")
+  case n > 3 && n < 9:
+    fmt.Println("3 < n < 9")
+  default:
+    fmt.Println("other")
+}
+```
+### switch 型スイッチ
+```go
+func anything (a interface{}) {
+  fmt.Println(a)
+}   
+
+func main () {
+  anything("aa")
+  anything(1)
+
+  var x interface{} = 3
+  // 型アサーション 変数.(復元したい型)
+  i := x.(int)
+  fmt.Println(i+2)
+
+  // これはエラー。計算することができない。
+  // fmt.Println(x+2)
+
+
+  /* xは3で定義しているので、型アサーションできずに強制終了する。 */
+  f := x.(float64)
+  
+  /* こうすると、強制終了せずにすむ。fには0、isFloat64にはFalseが返ってくる */
+  f, isFloat64 := x.(float64)
+
+  /* これを利用するとif文でこんなことができる */
+  if x == nil {
+    fmt.Println("None")
+  } else if i, isInt := x.(int) ; isInt {
+
+  } else if s, isString := x.(string) ; isString {
+
+  } else {
+
+  }
+
+  switch x.(type) {
+    
+  case int:
+
+  case string:
+
+  default:
+  
+  }
+  
+  switch v := x.(type) {
+    
+  case bool:
+
+  case string:
+
+  default:
+  
+  }
+
+}
+```
+## 参照型
+### スライス
+```go
+//宣言。配列と比べると要素数を書かない
+var sl []int
+```
+```go
+// 明示的な宣言
+var sl []int = []int{100,200}
+```
+```go
+// 暗黙的な宣言
+sl := []string{"A", "B"}
+```
+
+```go
+//第二引数に要素数を入れる
+sl := make([]int, 5)
+
+// [0 0 0 0 0]が生成される
+```
+
+```go
+// 値の更新
+sl[0] = 1000
+```
+
+```go
+// 値の取り出し
+sl :=[]int{1,2,3,4,5}
+
+// 0番目を取り出す
+sl[0]
+
+// ２番目から４番目まで全て取り出す[3 4]
+sl[2:4]
+
+// ２番目まで全て取り出す[1 2]
+sl[:2]
+
+// ２番目以降全て取り出す [3 4 5]
+sl[2:]
+
+//配列の全てが取り出せる. [1 2 3 4 5]
+sl[:]
+
+// 最後を取り出す 5
+sl[len(sl) - 1]
+
+// 最初と最後以外を取り出すw[2 3 4]
+sl[1 : len(sl) - 1]
