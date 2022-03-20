@@ -265,6 +265,10 @@ func intergers() func() int {
 
 ## 制御構文
 ### if文
+
+参考 : 簡易文付きif文 
+https://code-database.com/knowledges/97
+
 ```go
 func main () {
   
@@ -288,11 +292,6 @@ func main () {
   /* 未定義(0)が出力される */
 }
 ```
-参考 : 簡易文付きif文 
-https://code-database.com/knowledges/97
-
-<br>
-
 ###　エラーハンドリング
 
 ```go
@@ -636,5 +635,35 @@ if !ok {
 
 //マップの削除
 delete(m, 3)
+
+//マップfor
+for k, v := range m {
+  fmt.Println(k,v)
+}
 ```
+
+配列、スライス、マップの範囲for文
+
+```go
+arr = [3]int{1,2,3}
+sl := []int{1,2,3}
+var m := map[int]string{
+  1 : "JAPAN",
+  2 : "CHINA",
+  3 * "USA"
+}
+
+for i, v := range arr {
+  fmt.Println(i,v)
+}
+
+for i, v := range sl {
+  fmt.Println(i,v)
+}
+
+for k,v := range m {  
+  fmt.Pringln(k,v)
+}
+```
+
 
