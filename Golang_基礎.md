@@ -292,7 +292,7 @@ func main () {
   /* 未定義(0)が出力される */
 }
 ```
-###　エラーハンドリング
+### エラーハンドリング
 
 ```go
 var s string = "100"
@@ -650,7 +650,7 @@ sl := []int{1,2,3}
 var m := map[int]string{
   1 : "JAPAN",
   2 : "CHINA",
-  3 * "USA"
+  3 : "USA"
 }
 
 for i, v := range arr {
@@ -665,5 +665,156 @@ for k,v := range m {
   fmt.Pringln(k,v)
 }
 ```
+### チャネル
+![](2022-03-20-13-59-02.png)
 
+複数のゴルーチン間でデータを受け渡しをするために設計されたデータ構造
 
+#### 宣言
+```go
+// チャネルの宣言
+var ch chan int
+
+// 受信専用のチャネルの宣言
+var ch_rev<-chan int
+
+// 送信専用のチャネルの宣言
+var ch_snd chan<- int
+```
+
+#### 初期化
+```go
+// 初期化を行って、書き込み、読み込みができるようにする
+var ch chan int
+ch = make(chan int)
+```
+```go
+// 直接make関数を使って、宣言&初期化をすることができる
+ch := make(chan int)
+```
+
+```go
+//チャネルの容量を指定して初期化
+ch := make(chan int, 5)
+```
+
+#### データ送受信
+チャネルの仕組みはFIFOになっている.
+```go
+// 1というデータをチャネルchに送信
+ch <- 1
+ch <- 2
+ch <- 3
+
+// データを受信
+fmt.Println(len(ch)) //3
+fmt.Println(<-ch)    //1を受信
+
+fmt.Println(len(ch)) //2
+fmt.Println(<-ch)    //2を受信
+
+fmt.Println(len(ch)) //1
+fmt.Println(<-ch)    //3を受信
+
+fmt.Println(len(ch)) //0
+```
+チャネルの容量を超えて送信してしまった場合、デッドロックとなってしまう。
+```go
+var ch := make(chan int, 3)
+
+ch <- 1
+ch <- 2
+ch <- 3
+ch <- 4
+// デッドロック！！！
+```
+#### チャネルとゴルーチン
+```go
+func receiver( c chan int){
+  for{
+    i := <-c
+    fmt.Println(i)
+  }
+}
+
+// ゴルーチンを並列処理で
+func main() {
+  ch1 := make(chan int)
+  ch2 := make(chan int)
+  
+  go receiver (ch1)
+  go receiver (ch2)
+  
+  i := 0
+  fot i < 100 {
+      ch1 <- i
+      ch2 <- i
+      time.Sleep(50*time.Millisecond)
+      i++
+  }
+}
+```
+
+#### チャネルclose
+チャネルをクローズして送信ができないように変更することができる。
+ただし受信はできる。
+```go
+ch := make(chan int)
+
+//1を送信
+ch<-1
+
+//チャネルをクローズ。以降、このチャネルへの送信不可となる。
+close (ch)
+
+//データ受信をする時に、エラーハンドリングでチャネルが閉じられているかどうかを見ることができる。
+// iには1, okにはfalseが入る。
+i, ok := <-ch
+```
+
+```go
+func receiver(name string, chan int){
+  for{
+      i, ok := <-ch
+
+      //closeされたら抜ける
+      if !ok {
+        break;
+      }
+      fmt.Println(name, i)
+  }
+
+  //ゴルーチンの終了
+  fmt.Println(name + END)
+}
+
+func main () {
+
+  // ゴルーチンを3つ起動させる。
+  go receiver("1.go routin", ch)
+  go receiver("2.go routin", ch)
+  go receiver("3.go routin", ch)
+
+  i := 0
+  for i < 100 {
+    ch <- i
+    i++
+  }
+  close(ch)
+}
+```
+
+### チャネルfor
+```go
+ch := make(chan int, 3)
+ch <- 1
+ch <- 2
+ch <- 3
+
+// forで値を受信する時はcloseしないとデッドロックしてしまう。
+close (ch)
+for i := range ch {
+  fmt.Println(i)
+}
+
+```
