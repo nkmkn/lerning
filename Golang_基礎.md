@@ -604,6 +604,7 @@ func main () {
 ```
 ### マップ
 Rubyでいう**ハッシュ**
+Pythonでいう**辞書**
 Javascriptでいう**オブジェクト**
 ```go
 // map[キー型名]バリュー型名{ キー : バリュー ,キー : バリュー ,キー : バリュー ...}
@@ -804,7 +805,7 @@ func main () {
 }
 ```
 
-### チャネルfor
+#### チャネルfor
 ```go
 ch := make(chan int, 3)
 ch <- 1
@@ -818,3 +819,170 @@ for i := range ch {
 }
 
 ```
+
+#### チャネルselect
+https://qiita.com/najeira/items/71a0bcd079c9066347b4
+
+```go
+//チャネルに値が入っていない時はブロックする。
+select {
+  case v := <-ch:
+    fmt.Println(v)
+  default:
+    fmt.Println("No Value!")
+}
+```
+closeされているとブロックせずに`case v:= <-ch`が実行される。  
+受信かcloseか区別したい場合は以下のようにする。
+```go
+select{
+  case v, ok := <-ch:
+    if ok {
+      fmt.Println(v)
+    }else{
+      fmt.Println("closed")
+    }
+  default:
+    fmt.Println("no value")
+}
+
+```
+## 構造体
+### struct
+```go
+//構造体を定義
+type User struct {
+  Name string
+  Age int
+}
+
+func main () {
+  var user1 User
+  user1.Name = "Nakama"
+  user1.Age = 33
+
+  user2 := User{}
+  user2.Name = "Nakama"
+  user2.Age = 33
+
+  //初期値を設定
+  user3 := User{Name: "Nakama", Age: 33}
+
+  //初期値を設定 変数名を省略することができる
+  user4 := User{"Nakama", 33}
+}
+```
+```go
+// 構造体は参照渡しをすることが多い
+func UpdateUser( user *User ){
+  User.Name = "Nakama"
+  User.Age = 33
+}
+
+func main () {
+  user := &User{}
+  UpdateUser(user)
+}
+```
+
+### struct メソッド
+```go
+type User struct {
+  Name string
+  Age int
+}
+
+func (u User) SayName(){
+  fmt.Println()
+}
+
+func (u *User) SetName(name string){
+  u.Name = name
+}
+
+func main () {
+  user1 := User{Name : Nakama}
+  user1.SayName()
+  user1.SetName("Nakama")
+}
+```
+### struct 埋め込み
+```go
+type t struct{
+  User User
+}
+
+type User struct{
+  Name string
+  Age int
+}
+func (u *User) SetName(name string) {
+  u.Name = name
+}
+
+func main(){
+  t := t{User:User{Name:Nakama, Age:33}}
+  t.User.SetName("A")
+}
+```
+
+```go
+//型名を省略できる
+type t struct{
+  User
+}
+
+type User struct{
+  Name string
+  Age int
+}
+
+func (u *User) SetName(name string) {
+  u.Name = name
+}
+
+func main(){
+  t := t{User:User{Name:Nakama, Age:33}}
+
+  //省略した場合はUserを書かない
+  t.SetName("A")
+}
+```
+
+### struct型コンストラクタ
+https://golangstart.com/constructor/
+```go
+type User struct {
+  Name string
+  Age int
+}
+
+func NewUser(name string, age int) *User{
+  return &User{Name: name, Age: age}
+}
+
+func main () {
+  user1 := NewUser("Nakama", 33)
+}
+```
+### struct スライス
+```go
+type User struct {
+  Name string
+  Age int
+}
+
+type Users []*User
+
+func main () {
+  user0 := User{Name: "user0", Age: 10}
+  user1 := User{Name: "user1", Age: 10}
+  user2 := User{Name: "user2", Age: 10}
+  user3 := User{Name: "user3", Age: 10}
+
+  users := Users{}
+
+  users = append(users, user0, user1, user2, user3)
+}
+```
+
