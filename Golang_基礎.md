@@ -985,4 +985,16 @@ func main () {
   users = append(users, user0, user1, user2, user3)
 }
 ```
+### struct 独自型
+```go
+// typeを使った自分型を作ることができる
+type Myint int
 
+// 自分で作った型に対してメソッドを作ることもできる
+func (mi Myint) Print(){
+    var mi Myint
+    
+    // メソッドを使用
+    mi.Print()
+}
+```
