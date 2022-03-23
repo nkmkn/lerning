@@ -985,6 +985,7 @@ func main () {
   users = append(users, user0, user1, user2, user3)
 }
 ```
+
 ### struct 独自型
 ```go
 // typeを使った自分型を作ることができる
@@ -996,5 +997,45 @@ func (mi Myint) Print(){
     
     // メソッドを使用
     mi.Print()
+}
+```
+## interface
+### intaerface型の最もポピュラーな使い方
+最もポピュラーな使い方。異なる型に共通の性質を与える。
+```go
+// ToString()という文字列を返すメソッドを持つ性質のものを
+// Stringfyという型でまとめることができる　
+type Stringfy interface{
+  ToString() string
+}
+
+type Person struct {
+  Name string
+  Age int
+}
+
+func (p *Persion) ToString() string {
+  return fmt.Sprintf("Name=%v, Age=%v", p.Name, p.Age)
+}
+
+type Car struct {
+  Number string
+  Model string
+}
+
+func (c*Car) ToString() string {
+  return fmt.Sprintd("Number=%v, Model=%v", c.Number, c.Model)
+}
+
+func main() {
+  // Stringfy型のスライスを定義
+  vs := []Stringfy{
+    &Person{Name:"Nakama", Age:33},
+    &Car{Number:"123-456", Model:"AB-1234"},
+  }
+
+  for _,v := range vs{
+    fmt.Println(v.ToString())
+  }
 }
 ```
