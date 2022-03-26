@@ -886,6 +886,9 @@ func main () {
 ```
 
 ### struct メソッド
+この記事がわかりやすく関数とメソッドの違いについて解説している。
+https://qiita.com/yosuke_takeuchi/items/5bd061b4a766c43c9995
+
 ```go
 type User struct {
   Name string
@@ -1000,7 +1003,7 @@ func (mi Myint) Print(){
 }
 ```
 ## interface
-### intaerface型の最もポピュラーな使い方
+### interface型の最もポピュラーな使い方
 最もポピュラーな使い方。異なる型に共通の性質を与える。
 ```go
 // ToString()という文字列を返すメソッドを持つ性質のものを
@@ -1014,7 +1017,7 @@ type Person struct {
   Age int
 }
 
-func (p *Persion) ToString() string {
+func (p *Person) ToString() string {
   return fmt.Sprintf("Name=%v, Age=%v", p.Name, p.Age)
 }
 
@@ -1039,3 +1042,60 @@ func main() {
   }
 }
 ```
+### カスタムエラー
+GO言語ではエラーを処理するためにinterface型として実装されている。
+https://qiita.com/nayuneko/items/3c0b3c0de9e8b27c9548
+
+```go
+type error interface {
+  Error() string
+}
+```
+これは`func Error() string`という
+- 名前がError
+- 引数がない
+- 戻り値がstring型
+を定義すると全てerrorインターフェースとしてみなされるということ。
+これを利用して自分独自のエラーメソッドを作っていく。
+
+```go
+type MyError struct {
+  Message string
+  ErrCode int
+}
+
+// ポインタレシーバ。独自のエラーメソッドで、エラーメッセージを返す。
+func (e *MyError) Error() string {
+  return e *Message
+}
+
+// エラー発生関数
+func RaiseError() error {
+  return &MyError{Message: "カスタムエラーが発生しました。", ErrCode: 1234}
+}
+
+func main () {
+  err := RaiseError()
+  fmt.Println(err.Error())
+
+  // MyErrorで定義されているフィールドにアクセスするには
+  // 型アサーションで復元してアクセスする。
+  // errはinterface型であるerror型なので
+  // *MyError型にアサーションしてやる。
+  e, ok := err.(*MyError)
+  if ok {
+    fmt.Println(e.ErrCode)
+  }
+}
+```
+### interface Stringer
+Go言語には
+```go
+type Stringer interface {
+  String() string
+}
+```
+が用意されていて、Println()の出力結果をカスタマイズすることができる。
+詳しくは以下。
+https://selfnote.work/20200716/programming/stringer-with-golang/
+
