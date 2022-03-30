@@ -1099,3 +1099,192 @@ type Stringer interface {
 詳しくは以下。
 https://selfnote.work/20200716/programming/stringer-with-golang/
 
+## パブリックとプライベート、パッケージの分割
+```go
+package foo
+
+const (
+  // 先頭大文字にすると他のパッケージからも参照できる(パブリック)
+  Max = 100
+
+  // 小文字にすると他のパッケージから参照できない（プライベート）
+  min = 1
+)
+
+func ReturnMin() int {
+  return min
+}
+```
+### モジュール管理の補足
+自作モジュールを作る時は以下の記事を参考に作ればOK
+https://qiita.com/taku-yamamoto22/items/4d6f9ff8451a0b86997b
+
+## テスト
+### テスト
+パッケージごとに簡単にテストコードを書くことが可能。詳しい手順は以下。
+https://qiita.com/saya713y/items/f7ee07e8f12ab85ed9bf
+
+実際にどんな関数でテストするのか？
+
+## Goのツールについて
+### ツールDoc
+`go`とコマンドを打てば、コマンド一覧が表示される。
+
+## 標準パッケージ
+### os
+### os.Exit
+```go
+func main () {
+  defer someFunc() // 破棄される
+  os.Exit(1) // 正常終了
+  /* 引数が0なら異常終了 */
+}
+```
+ユーザー入力による予期されるエラーなどに対しては正常終了させる。
+### os.Open
+```go
+func main () {
+  //ファイル操作
+  f, err := os.Open("A.txt")
+  if err != nil {
+    log.Fatalln(err)
+  }
+  defer f.Close()
+}
+```
+### os.Args
+
+### os.Create
+ファイルの作成を行う
+
+### os.OpenFile
+```go
+// 第２引数
+  // O_RDONLY 読み込み専用
+  // O_WRONLY 書き込み専用
+  // O_RDWR 読み書き可能
+  // O_APPEND ファイルの末尾に追記
+  // O_CRATE ファイルがなければ作成
+  // O_TRUNC  可能であればファイルの内容をオープン時に空にする
+// 第３引数
+  // パーミッション
+f, err := os.OpenFile("foo.txt", os.O_RDWD|os.O_CREATE, 0666)
+if err != nil {
+  log.Fatalln(err)
+}
+
+defer f.Close
+
+```
+パーミッションについては以下を参照。
+http://web.tku.ac.jp/~densan/local/permission/permission.htm
+
+
+### time
+### math
+### rand
+### flag
+### fmt
+### fmtの詳細
+### log
+### strings
+文字列に含まれる部分文字列を検索する。
+文字列の分割
+大文字小文字の変換
+### buflo
+### ioutil
+### regexp
+正規表現のためのパッケージ
+### regexpの詳細
+### sync
+### cypto
+### cypto詳細
+### json
+### json
+### sort 
+### context
+タイムアウトを簡単に実装することができる。
+```go
+imoport{
+  "import"
+  "fmt"
+  "time"
+}
+
+// 単純に処理時間がかかる関数
+func longProcess(ctx context.Context, ch chan string) {
+  fmt.Println("開始")
+  time.Sleep(2*time.Second)
+  fmt.Println("終了")
+  ch <- "実行結果"
+}
+
+func main () {
+  ch := make(chan string)
+
+  // コンテキストを作成
+  ctx := context.Background()
+
+  // ctxに1秒のタイムアウトをつけた状態で再定義
+  ctx, cancel := context.WithTimeout(ctx, 1*time.second)
+
+  // リソースの解放処理
+  defer cancel()
+
+  go longProcess(ctx, ch)
+
+
+L: 
+  for{
+    select{
+    // 1秒間で処理が終わらなかったら
+    case <-ctx.Done():
+      fmt.Println("##########Error##########")
+      fmt.Println(ctx.Err())
+      break L
+
+    case s := <-ch:
+      fmt.Println(s)
+      fmt.Println("success")
+      break L
+    }
+  }
+
+  fmt.Println("ループ抜けた")
+}
+```
+### net/url
+この記事を参考にすると良い。
+https://golangstart.com/go_url/
+
+```go
+func main() {
+  // URL解析
+  //第１引数はURL構造体の値
+  //第２引数はエラー値
+  u, _ := url.Parse("https://golangstart.com/serch?a=1&b=2#top")
+
+  fmt.Println(u.Scheme)   // http
+  fmt.Println(u.Host)     // golangstart.com
+  fmt.Println(u.Path)     // /serch
+  fmt.Println(u.RawQuery) // a=1&b=2
+  fmt.Println(u.Fragment) // top
+
+  // mapで出力
+  fmt.Println(u.Query()) // map[a:[1] b:[2]]
+}
+```
+
+```go
+func main() {
+    // URLを生成
+    url := &url.URL{}  // ポインタ型で指定するのが一般的
+    url.Scheme = "https"
+    url.Host = "golang.com"
+     fmt.Println(url)
+}
+```
+```
+### net/http, client
+### net/http, clientの応用
+### net/http, server
