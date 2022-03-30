@@ -1099,3 +1099,65 @@ type Stringer interface {
 詳しくは以下。
 https://selfnote.work/20200716/programming/stringer-with-golang/
 
+## サードパーティパッケージ
+### database/sqllite3
+http://go-database-sql.org/index.html
+https://sourjp.github.io/posts/go-db/
+
+#### 簡単なデータベースのオープン/クローズ
+```go
+package main
+
+import (
+    "database/sql"
+    "log"
+
+    _ "github.com/mattn/go-sqlite3"
+)
+
+var Db *sql.DB
+
+func main () {
+    
+    /* openは *sql.DB型を返す */
+    /* ./と書くことで現在のディレクトリにexample.sqlがあれば接続しなければ作成する */
+    Db, err  = sql.Open("sqlite3", "./example.sql")
+
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    defer Db.Close()
+
+    /* ここに後述のCreate,Read, Update,Deleteの処理を書く */
+}
+
+```
+
+#### Create テーブルの作成
+```go
+    // personsテーブルがなければ作成する
+    cmd := `CREATE TABLE IF NOT EXISTS persons(
+                name STRING,
+                age INT)`
+
+    _, err := Db.Exec(cmd)
+
+    if err != nil {
+        log.Fatelln(err)
+    }
+```
+
+#### Update データの追加
+```go
+    // personsテーブルがなければ作成する
+    cmd := `CREATE TABLE IF NOT EXISTS persons(
+                name STRING,
+                age INT)`
+
+    _, err := Db.Exec(cmd)
+
+    if err != nil {
+        log.Fatelln(err)
+    }
+```
